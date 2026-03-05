@@ -37,27 +37,19 @@ export function generateICS(artists: Artist[], dayLabel: string): string {
   return value!;
 }
 
-export async function downloadICS(content: string, filename: string) {
+export function downloadICS(content: string, filename: string) {
   const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
-
-  // 手機優先用原生分享，讓系統提示用日曆 App 開啟
-  if (navigator.share && navigator.canShare) {
-    const file = new File([blob], filename, { type: "text/calendar" });
-    if (navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        return;
-      } catch {
-        // 使用者取消分享，fallback 到下載
-      }
-    }
-  }
-
-  // 桌面 fallback
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = filename;
+
+  // 手機：不設 download 屬性，讓瀏覽器直接用日曆 App 開啟 .ics
+  // 桌面：設 download 屬性觸發下載
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!isMobile) {
+    link.download = filename;
+  }
+
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
