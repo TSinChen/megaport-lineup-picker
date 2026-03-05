@@ -9,10 +9,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "大港開唱 Lineup 勾選工具",
+  title: "大港開唱 選團器",
   description: "在 lineup 圖上圈選你想看的藝人，下載圖片分享或匯出行程日曆",
   openGraph: {
-    title: "大港開唱 Lineup 勾選工具",
+    title: "大港開唱 選團器",
     description: "在 lineup 圖上圈選你想看的藝人，下載圖片分享或匯出行程日曆",
     type: "website",
   },

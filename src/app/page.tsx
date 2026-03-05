@@ -39,7 +39,7 @@ export default function Home() {
     <main className="max-w-2xl mx-auto pt-6 pb-24">
       <header className="text-center mb-6 px-4">
         <h1 className="text-2xl font-black tracking-tight">
-          大港開唱 Lineup 勾選工具
+          大港開唱 選團器
         </h1>
         <p className="text-zinc-500 text-sm mt-1">
           點擊圖片上的藝人來標記，下載圖片或匯出行程

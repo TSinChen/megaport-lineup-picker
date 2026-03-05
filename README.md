@@ -1,6 +1,6 @@
 # megaport-lineup-picker
 
-## 大港開唱 Lineup 勾選工具
+## 大港開唱 選團器
 
 在大港開唱的 lineup 圖上直接點選想看的藝人，產出標記後的圖片、文字行程或 ICS 日曆檔。
 
