@@ -39,12 +39,12 @@ export default function SelectedList({
           key={artist.id}
           className="flex items-center justify-between bg-zinc-800/50 rounded-lg px-3 py-2 group"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-yellow-400 font-mono text-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-yellow-400 font-mono text-sm shrink-0">
               {formatTime(artist.startTime)}
             </span>
-            <span className="text-zinc-500 text-xs">{artist.stage}</span>
-            <span className="text-white text-sm font-medium">
+            <span className="text-zinc-500 text-xs shrink-0">{artist.stage}</span>
+            <span className="text-white text-sm font-medium truncate">
               {artist.name}
             </span>
           </div>
