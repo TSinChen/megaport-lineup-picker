@@ -9,6 +9,7 @@ interface ActionBarProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   artists: Artist[];
   selectedIds: string[];
+  year: number;
   day: number;
   date: string;
 }
@@ -17,6 +18,7 @@ export default function ActionBar({
   canvasRef,
   artists,
   selectedIds,
+  year,
   day,
 }: ActionBarProps) {
   const [isMobile, setIsMobile] = useState(false);
@@ -40,7 +42,7 @@ export default function ActionBar({
   const handleShare = async () => {
     if (!canvasRef.current) return;
     try {
-      await shareCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
+      await shareCanvas(canvasRef.current, `megaport-${year}-day${day}-lineup.png`);
     } catch {
       // 使用者取消分享
     }
@@ -48,13 +50,13 @@ export default function ActionBar({
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
-    downloadCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
+    downloadCanvas(canvasRef.current, `megaport-${year}-day${day}-lineup.png`);
   };
 
   const handleExportICS = () => {
     if (selected.length === 0) return;
     const ics = generateICS(selected, `大港開唱 Day${day}`);
-    downloadICS(ics, `megaport-day${day}.ics`);
+    downloadICS(ics, `megaport-${year}-day${day}.ics`);
   };
 
   const disabled = selected.length === 0;

@@ -7,8 +7,8 @@ import DayTabs from "@/components/DayTabs";
 import LineupCanvas from "@/components/LineupCanvas";
 import SelectedList from "@/components/SelectedList";
 import ActionBar from "@/components/ActionBar";
-import day1Data from "@/data/day1.json";
-import day2Data from "@/data/day2.json";
+import day1Data from "@/data/2026/day1.json";
+import day2Data from "@/data/2026/day2.json";
 
 const lineups: Record<number, DayLineup> = {
   1: day1Data as DayLineup,
@@ -21,18 +21,19 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const lineup = lineups[currentDay];
+  const year = lineup.year;
 
   // 從 LocalStorage 還原勾選狀態
   useEffect(() => {
-    setSelectedIds(getSelectedForDay(currentDay));
-  }, [currentDay]);
+    setSelectedIds(getSelectedForDay(year, currentDay));
+  }, [year, currentDay]);
 
   const handleToggle = useCallback(
     (artistId: string) => {
-      const updated = toggleArtist(currentDay, artistId);
+      const updated = toggleArtist(year, currentDay, artistId);
       setSelectedIds([...updated]);
     },
-    [currentDay]
+    [year, currentDay]
   );
 
   return (
@@ -57,6 +58,8 @@ export default function Home() {
       <div className="md:rounded-xl overflow-hidden md:border md:border-zinc-800 mb-4">
         <LineupCanvas
           imageFile={lineup.imageFile}
+          imageWidth={lineup.imageWidth}
+          imageHeight={lineup.imageHeight}
           artists={lineup.artists}
           selectedIds={selectedIds}
           onToggle={handleToggle}
@@ -76,6 +79,7 @@ export default function Home() {
         canvasRef={canvasRef}
         artists={lineup.artists}
         selectedIds={selectedIds}
+        year={year}
         day={currentDay}
         date={lineup.date}
       />

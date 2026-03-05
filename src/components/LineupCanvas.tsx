@@ -6,6 +6,8 @@ import { getCircleSvg, CIRCLE_RATIO } from "@/lib/canvas";
 
 interface LineupCanvasProps {
   imageFile: string;
+  imageWidth: number;
+  imageHeight: number;
   artists: Artist[];
   selectedIds: string[];
   onToggle: (artistId: string) => void;
@@ -14,6 +16,8 @@ interface LineupCanvasProps {
 
 export default function LineupCanvas({
   imageFile,
+  imageWidth,
+  imageHeight,
   artists,
   selectedIds,
   onToggle,
@@ -225,9 +229,13 @@ export default function LineupCanvas({
   };
 
   return (
-    <div ref={containerRef} className="w-full relative">
+    <div
+      ref={containerRef}
+      className="w-full relative"
+      style={{ aspectRatio: `${imageWidth} / ${imageHeight}` }}
+    >
       {loading && (
-        <div className="flex items-center justify-center py-20 text-zinc-400">
+        <div className="absolute inset-0 flex items-center justify-center text-zinc-400">
           <svg
             className="animate-spin h-8 w-8 mr-3"
             viewBox="0 0 24 24"
@@ -257,7 +265,7 @@ export default function LineupCanvas({
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`w-full ${loading ? "hidden" : "block"}`}
+        className="w-full"
       />
     </div>
   );

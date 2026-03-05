@@ -1,7 +1,10 @@
 {
+  "year": 2026,
   "day": 1,
   "date": "2026-03-21",
-  "imageFile": "day1.jpg",
+  "imageFile": "2026/day1.jpg",
+  "imageWidth": 1802,
+  "imageHeight": 2560,
   "artists": [
     {
       "id": "d1-01",

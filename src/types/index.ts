@@ -15,8 +15,11 @@ export interface Artist {
 }
 
 export interface DayLineup {
+  year: number;
   day: number;
   date: string; // "2026-03-28"
-  imageFile: string; // "day1.jpg"
+  imageFile: string; // "2026/day1.jpg"
+  imageWidth: number;
+  imageHeight: number;
   artists: Artist[];
 }

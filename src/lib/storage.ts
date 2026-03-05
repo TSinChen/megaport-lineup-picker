@@ -1,4 +1,8 @@
-const STORAGE_KEY = "megaport-lineup-selected";
+const STORAGE_KEY_PREFIX = "megaport-lineup-selected";
+
+function getStorageKey(year: number): string {
+  return `${STORAGE_KEY_PREFIX}-${year}`;
+}
 
 function isValidData(data: unknown): data is Record<number, string[]> {
   if (typeof data !== "object" || data === null || Array.isArray(data))
@@ -11,10 +15,10 @@ function isValidData(data: unknown): data is Record<number, string[]> {
   return true;
 }
 
-export function getSelectedIds(): Record<number, string[]> {
+export function getSelectedIds(year: number): Record<number, string[]> {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey(year));
     if (!raw) return {};
     const parsed = JSON.parse(raw);
     return isValidData(parsed) ? parsed : {};
@@ -23,18 +27,18 @@ export function getSelectedIds(): Record<number, string[]> {
   }
 }
 
-export function saveSelectedIds(data: Record<number, string[]>): void {
+export function saveSelectedIds(year: number, data: Record<number, string[]>): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem(getStorageKey(year), JSON.stringify(data));
 }
 
-export function getSelectedForDay(day: number): string[] {
-  const all = getSelectedIds();
+export function getSelectedForDay(year: number, day: number): string[] {
+  const all = getSelectedIds(year);
   return all[day] || [];
 }
 
-export function toggleArtist(day: number, artistId: string): string[] {
-  const all = getSelectedIds();
+export function toggleArtist(year: number, day: number, artistId: string): string[] {
+  const all = getSelectedIds(year);
   const current = all[day] || [];
   const index = current.indexOf(artistId);
   if (index >= 0) {
@@ -43,6 +47,6 @@ export function toggleArtist(day: number, artistId: string): string[] {
     current.push(artistId);
   }
   all[day] = current;
-  saveSelectedIds(all);
+  saveSelectedIds(year, all);
   return current;
 }
