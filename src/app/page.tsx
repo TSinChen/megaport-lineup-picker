@@ -47,7 +47,7 @@ export default function Home() {
         </p>
       </header>
 
-      <div className="flex justify-center mb-4 px-4">
+      <div className="flex justify-center mb-4 px-4 sticky top-0 z-40 bg-black/85 py-3">
         <DayTabs
           currentDay={currentDay}
           onDayChange={setCurrentDay}
