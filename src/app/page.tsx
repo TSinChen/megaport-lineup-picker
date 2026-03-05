@@ -42,7 +42,7 @@ export default function Home() {
           大港開唱 選團器
         </h1>
         <p className="text-zinc-500 text-sm mt-1">
-          點擊圖片上的藝人來標記，下載圖片或匯出行程
+          點擊圖片上的藝人來標記，分享圖片或加入日曆
         </p>
       </header>
 
