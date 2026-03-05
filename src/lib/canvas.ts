@@ -73,9 +73,31 @@ export function exportCanvasAsBlob(
   });
 }
 
-export function downloadCanvas(canvas: HTMLCanvasElement, filename: string) {
+export async function downloadCanvas(
+  canvas: HTMLCanvasElement,
+  filename: string
+) {
+  const blob = await exportCanvasAsBlob(canvas);
+  if (!blob) return;
+
+  // 手機優先用原生分享
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], filename, { type: "image/png" });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch {
+        // 使用者取消分享，fallback 到下載
+      }
+    }
+  }
+
+  // 桌面 fallback
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.download = filename;
-  link.href = canvas.toDataURL("image/png");
+  link.href = url;
   link.click();
+  URL.revokeObjectURL(url);
 }

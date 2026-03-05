@@ -50,7 +50,7 @@ export default function SelectedList({
           </div>
           <button
             onClick={() => onToggle(artist.id)}
-            className="text-zinc-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-lg"
+            className="text-zinc-600 hover:text-red-400 active:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 text-lg p-1"
             title="移除"
           >
             &times;

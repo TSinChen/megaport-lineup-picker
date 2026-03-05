@@ -28,9 +28,9 @@ export default function ActionBar({
         new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
     );
 
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
     if (canvasRef.current) {
-      downloadCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
+      await downloadCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
     }
   };
 
@@ -60,7 +60,7 @@ export default function ActionBar({
   const disabled = selected.length === 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur border-t border-zinc-800 p-3 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur border-t border-zinc-800 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-50">
       <div className="max-w-2xl mx-auto flex gap-2 justify-center">
         <button
           onClick={handleDownloadImage}
