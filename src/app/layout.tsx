@@ -15,7 +15,8 @@ export const metadata: Metadata = {
   title: "大港開唱 選團器",
   description: "在 lineup 圖上圈選你想看的藝人，完成後分享給朋友",
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟠</text></svg>",
+    icon: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "大港開唱 選團器",
