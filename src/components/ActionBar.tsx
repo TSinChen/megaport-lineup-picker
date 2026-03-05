@@ -20,9 +20,14 @@ export default function ActionBar({
   day,
 }: ActionBarProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const [isIOSSafari, setIsIOSSafari] = useState(false);
 
   useEffect(() => {
-    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    const ua = navigator.userAgent;
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(ua));
+    // iOS Safari: 有 Safari 但沒有 CriOS/FxiOS/其他瀏覽器標識
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    setIsIOSSafari(isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua));
   }, []);
 
   const selected = artists
@@ -81,16 +86,18 @@ export default function ActionBar({
           </svg>
           下載圖片
         </button>
-        <button
-          onClick={handleExportICS}
-          disabled={disabled}
-          className={btnSecondary}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          匯出日曆
-        </button>
+        {(!isMobile || isIOSSafari) && (
+          <button
+            onClick={handleExportICS}
+            disabled={disabled}
+            className={btnSecondary}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            匯出日曆
+          </button>
+        )}
       </div>
     </div>
   );
