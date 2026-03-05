@@ -12,10 +12,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "大港開唱 選團器",
-  description: "在 lineup 圖上圈選你想看的藝人，分享圖片或加入日曆",
+  description: "在 lineup 圖上圈選你想看的藝人，完成後分享給朋友",
   openGraph: {
     title: "大港開唱 選團器",
-    description: "在 lineup 圖上圈選你想看的藝人，分享圖片或加入日曆",
+    description: "在 lineup 圖上圈選你想看的藝人，完成後分享給朋友",
     type: "website",
   },
 };
