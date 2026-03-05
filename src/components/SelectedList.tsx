@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Artist } from "@/types";
 import { formatTime } from "@/lib/format";
 
@@ -31,6 +32,16 @@ export default function SelectedList({
   selectedIds,
   onToggle,
 }: SelectedListProps) {
+  const [isIOSSafari, setIsIOSSafari] = useState(false);
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    setIsIOSSafari(
+      isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua)
+    );
+  }, []);
+
   const selected = artists
     .filter((a) => selectedIds.includes(a.id))
     .sort(
@@ -66,17 +77,19 @@ export default function SelectedList({
             </span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <a
-              href={getGoogleCalendarUrl(artist)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-zinc-600 hover:text-yellow-400 active:text-yellow-400 transition-colors p-1.5"
-              title="加入 Google 日曆"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </a>
+            {!isIOSSafari && (
+              <a
+                href={getGoogleCalendarUrl(artist)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-600 hover:text-yellow-400 active:text-yellow-400 transition-colors p-1.5"
+                title="加入 Google 日曆"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </a>
+            )}
             <button
               onClick={() => onToggle(artist.id)}
               className="text-zinc-600 hover:text-red-400 active:text-red-400 transition-colors text-xl p-2"
