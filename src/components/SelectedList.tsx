@@ -65,7 +65,7 @@ export default function SelectedList({
       {selected.map((artist) => (
         <div
           key={artist.id}
-          className="flex items-center justify-between bg-zinc-800/50 rounded-lg px-3 py-2 group"
+          className="flex items-center justify-between gap-4 bg-zinc-800/50 rounded-lg px-3 py-2 group"
         >
           <div className="flex items-center gap-3 min-w-0">
             <span className="text-yellow-400 font-mono text-sm shrink-0">
@@ -82,7 +82,7 @@ export default function SelectedList({
                 href={getGoogleCalendarUrl(artist)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-600 hover:text-yellow-400 active:text-yellow-400 transition-colors p-1.5"
+                className="text-yellow-400 hover:text-yellow-300 active:text-yellow-300 transition-colors p-1.5"
                 title="加入 Google 日曆"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@ export default function SelectedList({
             )}
             <button
               onClick={() => onToggle(artist.id)}
-              className="text-zinc-600 hover:text-red-400 active:text-red-400 transition-colors text-xl p-2"
+              className="text-red-400 hover:text-red-300 active:text-red-300 transition-colors text-xl p-2"
               title="移除"
             >
               &times;
