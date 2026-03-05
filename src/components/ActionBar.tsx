@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import { Artist } from "@/types";
 import { downloadCanvas, shareCanvas } from "@/lib/canvas";
 import { generateICS, downloadICS } from "@/lib/ics";
-import { formatTime } from "@/lib/format";
-import { toast } from "sonner";
 
 interface ActionBarProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -20,7 +18,6 @@ export default function ActionBar({
   artists,
   selectedIds,
   day,
-  date,
 }: ActionBarProps) {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -35,36 +32,18 @@ export default function ActionBar({
         new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
     );
 
-  const handleImageAction = async () => {
+  const handleShare = async () => {
     if (!canvasRef.current) return;
-    const filename = `megaport-day${day}-lineup.png`;
-
-    if (isMobile) {
-      try {
-        await shareCanvas(canvasRef.current, filename);
-      } catch {
-        // 使用者取消分享，不做任何事
-      }
-    } else {
-      downloadCanvas(canvasRef.current, filename);
+    try {
+      await shareCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
+    } catch {
+      // 使用者取消分享
     }
   };
 
-  const handleCopySchedule = async () => {
-    if (selected.length === 0) return;
-
-    const dateStr = `${parseInt(date.split("-")[1])}/${parseInt(date.split("-")[2])}`;
-    let text = `🎵 我的大港開唱行程\nDay${day} (${dateStr})\n`;
-    text += selected
-      .map((a) => `${formatTime(a.startTime)} ${a.stage} - ${a.name}`)
-      .join("\n");
-
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success("已複製到剪貼簿！");
-    } catch {
-      toast.error("無法複製，請手動複製");
-    }
+  const handleDownload = () => {
+    if (!canvasRef.current) return;
+    downloadCanvas(canvasRef.current, `megaport-day${day}-lineup.png`);
   };
 
   const handleExportICS = () => {
@@ -74,38 +53,38 @@ export default function ActionBar({
   };
 
   const disabled = selected.length === 0;
+  const btnSecondary =
+    "flex items-center gap-2 px-4 py-2 bg-zinc-700 text-white rounded-lg font-bold text-sm hover:bg-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur border-t border-zinc-800 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-50">
       <div className="max-w-2xl mx-auto flex gap-2 justify-center">
-        <button
-          onClick={handleImageAction}
-          disabled={disabled}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg font-bold text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {isMobile ? (
+        {isMobile && (
+          <button
+            onClick={handleShare}
+            disabled={disabled}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg font-bold text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            )}
-          </svg>
-          {isMobile ? "分享圖片" : "下載圖片"}
-        </button>
+            </svg>
+            分享圖片
+          </button>
+        )}
         <button
-          onClick={handleCopySchedule}
+          onClick={handleDownload}
           disabled={disabled}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-700 text-white rounded-lg font-bold text-sm hover:bg-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className={isMobile ? btnSecondary : "flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg font-bold text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          複製行程
+          下載圖片
         </button>
         <button
           onClick={handleExportICS}
           disabled={disabled}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-700 text-white rounded-lg font-bold text-sm hover:bg-zinc-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className={btnSecondary}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
