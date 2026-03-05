@@ -3,6 +3,23 @@
 import { Artist } from "@/types";
 import { formatTime } from "@/lib/format";
 
+function toGoogleCalendarDate(iso: string): string {
+  // "2026-03-21T12:30" → "20260321T043000Z" (convert +0800 to UTC)
+  const date = new Date(iso);
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+function getGoogleCalendarUrl(artist: Artist): string {
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: artist.name,
+    dates: `${toGoogleCalendarDate(artist.startTime)}/${toGoogleCalendarDate(artist.endTime)}`,
+    location: `大港開唱 ${artist.stage}`,
+    details: `大港開唱 - ${artist.stage}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
+
 interface SelectedListProps {
   artists: Artist[];
   selectedIds: string[];
@@ -48,13 +65,26 @@ export default function SelectedList({
               {artist.name}
             </span>
           </div>
-          <button
-            onClick={() => onToggle(artist.id)}
-            className="text-zinc-600 hover:text-red-400 active:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 text-lg p-1"
-            title="移除"
-          >
-            &times;
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <a
+              href={getGoogleCalendarUrl(artist)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-600 hover:text-yellow-400 active:text-yellow-400 transition-colors p-1"
+              title="加入 Google 日曆"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </a>
+            <button
+              onClick={() => onToggle(artist.id)}
+              className="text-zinc-600 hover:text-red-400 active:text-red-400 transition-colors sm:opacity-0 sm:group-hover:opacity-100 text-lg p-1"
+              title="移除"
+            >
+              &times;
+            </button>
+          </div>
         </div>
       ))}
     </div>
