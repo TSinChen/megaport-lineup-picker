@@ -47,7 +47,11 @@ export default function Home() {
       </header>
 
       <div className="flex justify-center mb-4 px-4">
-        <DayTabs currentDay={currentDay} onDayChange={setCurrentDay} />
+        <DayTabs
+          currentDay={currentDay}
+          onDayChange={setCurrentDay}
+          days={Object.values(lineups).map((l) => ({ day: l.day, date: l.date }))}
+        />
       </div>
 
       <div className="md:rounded-xl overflow-hidden md:border md:border-zinc-800 mb-4">
