@@ -50,7 +50,7 @@ export default function Home() {
         <h1 className="text-2xl font-black tracking-tight">
           大港開唱 選團器
         </h1>
-        <p className="text-zinc-500 text-sm mt-1">
+        <p className="text-zinc-400 text-sm mt-1">
           點擊圖片上的藝人來標記，完成後分享給朋友
         </p>
       </header>

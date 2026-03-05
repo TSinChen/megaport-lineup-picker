@@ -51,7 +51,7 @@ export default function SelectedList({
 
   if (selected.length === 0) {
     return (
-      <div className="text-zinc-500 text-sm py-4 text-center">
+      <div className="text-zinc-400 text-sm py-4 text-center">
         點擊圖片上的藝人名稱來加入行程
       </div>
     );
@@ -59,9 +59,9 @@ export default function SelectedList({
 
   return (
     <div className="space-y-1">
-      <h3 className="text-sm font-bold text-zinc-400 mb-2">
+      <p className="text-sm font-bold text-zinc-400 mb-2">
         已選 {selected.length} 組藝人
-      </h3>
+      </p>
       {selected.map((artist) => (
         <div
           key={artist.id}
@@ -71,7 +71,7 @@ export default function SelectedList({
             <span className="text-yellow-400 font-mono text-sm shrink-0">
               {formatTime(artist.startTime)}
             </span>
-            <span className="text-zinc-500 text-xs shrink-0">{artist.stage}</span>
+            <span className="text-zinc-400 text-xs shrink-0">{artist.stage}</span>
             <span className="text-white text-sm font-medium truncate">
               {artist.name}
             </span>
