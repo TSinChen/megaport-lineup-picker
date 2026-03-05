@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-開啟 http://localhost:3000。
+開啟 <http://localhost:3000>。
 
 ## 座標編輯器
 
@@ -37,7 +37,7 @@ npm run dev
 npm run editor
 ```
 
-開啟 http://localhost:3456，在圖片上拖曳框選藝人區域，填入名稱、舞台、時間後匯出 JSON。
+開啟 <http://localhost:3456>，在圖片上拖曳框選藝人區域，填入名稱、舞台、時間後匯出 JSON。
 
 ## 資料格式
 
