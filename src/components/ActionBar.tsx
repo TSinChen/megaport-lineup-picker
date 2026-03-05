@@ -51,10 +51,10 @@ export default function ActionBar({
     }
   };
 
-  const handleExportICS = () => {
+  const handleExportICS = async () => {
     if (selected.length === 0) return;
     const ics = generateICS(selected, `大港開唱 Day${day}`);
-    downloadICS(ics, `megaport-day${day}.ics`);
+    await downloadICS(ics, `megaport-day${day}.ics`);
   };
 
   const disabled = selected.length === 0;

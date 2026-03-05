@@ -37,8 +37,23 @@ export function generateICS(artists: Artist[], dayLabel: string): string {
   return value!;
 }
 
-export function downloadICS(content: string, filename: string) {
+export async function downloadICS(content: string, filename: string) {
   const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+
+  // 手機優先用原生分享，讓系統提示用日曆 App 開啟
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], filename, { type: "text/calendar" });
+    if (navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch {
+        // 使用者取消分享，fallback 到下載
+      }
+    }
+  }
+
+  // 桌面 fallback
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
