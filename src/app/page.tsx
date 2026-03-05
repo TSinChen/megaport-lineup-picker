@@ -15,8 +15,16 @@ const lineups: Record<number, DayLineup> = {
   2: day2Data as DayLineup,
 };
 
+function getDefaultDay(): number {
+  const today = new Date().toISOString().slice(0, 10);
+  for (const lineup of Object.values(lineups)) {
+    if (lineup.date === today) return lineup.day;
+  }
+  return 1;
+}
+
 export default function Home() {
-  const [currentDay, setCurrentDay] = useState(1);
+  const [currentDay, setCurrentDay] = useState(getDefaultDay);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
