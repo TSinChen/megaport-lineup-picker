@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -31,6 +32,9 @@ export default function RootLayout({
         {children}
         <Analytics />
         <SpeedInsights />
+        {process.env.NODE_ENV === "production" && (
+          <GoogleAnalytics gaId="G-RB4LPHTNH5" />
+        )}
         <Toaster theme="dark" position="top-center" richColors />
       </body>
     </html>
