@@ -38,18 +38,21 @@ export function generateICS(artists: Artist[], dayLabel: string): string {
 }
 
 export function downloadICS(content: string, filename: string) {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // 手機：用 data URI 導航，觸發系統原生日曆處理
+    window.location.href =
+      "data:text/calendar;charset=utf-8," + encodeURIComponent(content);
+    return;
+  }
+
+  // 桌面：blob URL 下載
   const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-
-  // 手機：不設 download 屬性，讓瀏覽器直接用日曆 App 開啟 .ics
-  // 桌面：設 download 屬性觸發下載
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile) {
-    link.download = filename;
-  }
-
+  link.download = filename;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  URL.revokeObjectURL(url);
 }
