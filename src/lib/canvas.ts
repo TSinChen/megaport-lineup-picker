@@ -14,7 +14,7 @@ function loadCircleSvg(): Promise<HTMLImageElement> {
       resolve(img);
     };
     img.onerror = reject;
-    img.src = "/images/circle.svg";
+    img.src = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/circle.svg`;
   });
   return circleSvgLoading;
 }

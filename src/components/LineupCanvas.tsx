@@ -69,7 +69,7 @@ export default function LineupCanvas({
   useEffect(() => {
     setLoading(true);
     const img = new Image();
-    img.src = `/images/${imageFile}`;
+    img.src = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/${imageFile}`;
     img.onload = () => {
       imageRef.current = img;
       const canvas = canvasRef.current;
