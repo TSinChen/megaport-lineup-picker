@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Megaport 藝人座標編輯器</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: system-ui, sans-serif;
+        background: #1a1a2e;
+        color: #eee;
+      }
+      header {
+        padding: 12px 20px;
+        background: #16213e;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      header label {
+        font-size: 14px;
+      }
+      header select,
+      header input {
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #555;
+        background: #0f3460;
+        color: #eee;
+      }
+      .toolbar {
+        padding: 8px 20px;
+        background: #1a1a2e;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      button {
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .btn-primary {
+        background: #e94560;
+        color: #fff;
+      }
+      .btn-secondary {
+        background: #0f3460;
+        color: #eee;
+        border: 1px solid #555;
+      }
+      .btn-primary:hover {
+        background: #c73e54;
+      }
+      .btn-secondary:hover {
+        background: #1a4a8a;
+      }
+
+      .canvas-wrap {
+        position: relative;
+        display: inline-block;
+        margin: 12px 20px;
+        user-select: none;
+      }
+      .canvas-wrap img {
+        display: block;
+        width: calc(100vw - 40px);
+      }
+      .selection-box {
+        position: absolute;
+        border: 2px solid #4fc3f7;
+        background: rgba(79, 195, 247, 0.25);
+        pointer-events: none;
+      }
+      .artist-overlay {
+        position: absolute;
+        border: 2px solid #e94560;
+        background: rgba(233, 69, 96, 0.2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .artist-overlay span {
+        color: #fff;
+        font-size: 11px;
+        text-shadow: 0 0 4px #000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 2px;
+      }
+      .artist-overlay:hover {
+        background: rgba(233, 69, 96, 0.5);
+      }
+      .artist-overlay .del {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #e94560;
+        color: #fff;
+        font-size: 12px;
+        line-height: 18px;
+        text-align: center;
+        display: none;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      .artist-overlay:hover .del {
+        display: block;
+      }
+
+      /* Snap guide lines (transient, shown while dragging) */
+      .snap-guide {
+        position: absolute;
+        background: rgba(79, 195, 247, 0.6);
+        pointer-events: none;
+        z-index: 6;
+      }
+      .snap-guide.vertical {
+        width: 1px;
+      }
+      .snap-guide.horizontal {
+        height: 1px;
+      }
+
+      /* Reference grid lines (persistent, from another day's data) */
+      .ref-line {
+        position: absolute;
+        pointer-events: none;
+        z-index: 4;
+      }
+      .ref-line.vertical {
+        width: 1px;
+        background: rgba(255, 200, 50, 0.4);
+      }
+      .ref-line.horizontal {
+        height: 1px;
+        background: rgba(255, 200, 50, 0.4);
+      }
+
+      .form-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #16213e;
+        border: 1px solid #555;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 100;
+        min-width: 300px;
+        display: none;
+      }
+      .form-panel h3 {
+        margin-bottom: 12px;
+      }
+      .form-panel label {
+        display: block;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      .form-panel input {
+        width: 100%;
+        padding: 6px 8px;
+        margin-top: 4px;
+        border-radius: 4px;
+        border: 1px solid #555;
+        background: #0f3460;
+        color: #eee;
+      }
+      .form-panel .actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .overlay-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        display: none;
+      }
+
+      .info {
+        padding: 4px 20px;
+        font-size: 12px;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <label
+        >圖片：
+        <select id="imageSelect">
+          <option value="day1.jpg">day1.jpg</option>
+          <option value="day2.jpg">day2.jpg</option>
+        </select>
+      </label>
+      <label
+        >Day：
+        <input
+          id="dayNum"
+          type="number"
+          value="1"
+          min="1"
+          max="9"
+          style="width: 60px"
+        />
+      </label>
+      <label
+        >日期：
+        <input id="dayDate" type="date" value="2026-03-21" />
+      </label>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="exportJSON()">匯出 JSON</button>
+      <button
+        class="btn-secondary"
+        onclick="document.getElementById('importFile').click()"
+      >
+        匯入 JSON
+      </button>
+      <input
+        type="file"
+        id="importFile"
+        accept=".json"
+        style="display: none"
+        onchange="importJSON(event)"
+      />
+      <span class="info" id="artistCount">0 位藝人</span>
+      <span
+        style="border-left: 1px solid #444; height: 20px; margin: 0 4px"
+      ></span>
+      <label style="font-size: 13px"
+        >參考線來源
+        <select
+          id="refSource"
+          style="
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #0f3460;
+            color: #eee;
+          "
+        >
+          <option value="">無</option>
+          <option value="day1.json">day1.json</option>
+          <option value="day2.json">day2.json</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="canvas-wrap" id="canvasWrap">
+      <img id="lineupImg" src="/images/day1.jpg" crossorigin />
+      <div class="selection-box" id="selBox" style="display: none"></div>
+    </div>
+
+    <div class="overlay-bg" id="overlayBg"></div>
+    <div class="form-panel" id="formPanel">
+      <h3>新增藝人</h3>
+      <label
+        >名稱 <input id="fName" type="text" placeholder="例：滅火器"
+      /></label>
+      <label
+        >舞台
+        <input
+          id="fStage"
+          type="text"
+          list="stageList"
+          placeholder="例：南霸天"
+      /></label>
+      <datalist id="stageList"></datalist>
+      <label
+        >開始時間
+        <input
+          id="fStart"
+          type="text"
+          placeholder="HH:MM"
+          pattern="\d{1,2}:\d{2}"
+          style="font-variant-numeric: tabular-nums"
+      /></label>
+      <label
+        >結束時間
+        <input
+          id="fEnd"
+          type="text"
+          placeholder="HH:MM"
+          pattern="\d{1,2}:\d{2}"
+          style="font-variant-numeric: tabular-nums"
+      /></label>
+      <div
+        style="margin-top: 8px; font-size: 12px; color: #888"
+        id="fCoords"
+      ></div>
+      <div class="actions">
+        <button class="btn-secondary" onclick="cancelForm()">取消</button>
+        <button class="btn-primary" onclick="submitForm()">新增</button>
+      </div>
+    </div>
+
+    <script>
+      const wrap = document.getElementById("canvasWrap");
+      const img = document.getElementById("lineupImg");
+      const selBox = document.getElementById("selBox");
+      const formPanel = document.getElementById("formPanel");
+      const overlayBg = document.getElementById("overlayBg");
+      let artists = [];
+      let dragging = false;
+      let startX = 0,
+        startY = 0;
+      let pendingArea = null;
+      let idCounter = 0;
+
+      // --- Reference lines from another day's data ---
+      let refEdgesNorm = { x: [], y: [] }; // normalized 0-1 values
+      let refYToTime = []; // [{ y: normalized, time: 'HH:MM' }, ...]
+
+      document
+        .getElementById("refSource")
+        .addEventListener("change", async (e) => {
+          refEdgesNorm = { x: [], y: [] };
+          refYToTime = [];
+          if (!e.target.value) {
+            drawRefLines();
+            return;
+          }
+          try {
+            const res = await fetch("/data/" + e.target.value);
+            const data = await res.json();
+            const xs = new Set(),
+              ys = new Set();
+            const yTimeMap = new Map(); // y -> time string (HH:MM)
+            (data.artists || []).forEach((a) => {
+              const l = a.area.x - a.area.width / 2;
+              const r = a.area.x + a.area.width / 2;
+              const t = +(a.area.y - a.area.height / 2).toFixed(4);
+              const b = +(a.area.y + a.area.height / 2).toFixed(4);
+              xs.add(+l.toFixed(4));
+              xs.add(+r.toFixed(4));
+              ys.add(t);
+              ys.add(b);
+              // top edge = startTime, bottom edge = endTime
+              const st = (a.startTime || "").split("T")[1];
+              const et = (a.endTime || "").split("T")[1];
+              if (st && !yTimeMap.has(t)) yTimeMap.set(t, st);
+              if (et && !yTimeMap.has(b)) yTimeMap.set(b, et);
+            });
+            refEdgesNorm = {
+              x: [...xs].sort((a, b) => a - b),
+              y: [...ys].sort((a, b) => a - b),
+            };
+            refYToTime = [...yTimeMap.entries()]
+              .map(([y, time]) => ({ y, time }))
+              .sort((a, b) => a.y - b.y);
+            drawRefLines();
+          } catch (err) {
+            alert("無法載入參考資料：" + err.message);
+          }
+        });
+
+      function drawRefLines() {
+        wrap.querySelectorAll(".ref-line").forEach((el) => el.remove());
+        if (!refEdgesNorm.x.length && !refEdgesNorm.y.length) return;
+        const rect = img.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        const offX = rect.left - wrapRect.left;
+        const offY = rect.top - wrapRect.top;
+
+        for (const nx of refEdgesNorm.x) {
+          const el = document.createElement("div");
+          el.className = "ref-line vertical";
+          el.style.left = offX + nx * rect.width + "px";
+          el.style.top = offY + "px";
+          el.style.height = rect.height + "px";
+          wrap.appendChild(el);
+        }
+        for (const ny of refEdgesNorm.y) {
+          const el = document.createElement("div");
+          el.className = "ref-line horizontal";
+          el.style.top = offY + ny * rect.height + "px";
+          el.style.left = offX + "px";
+          el.style.width = rect.width + "px";
+          wrap.appendChild(el);
+        }
+      }
+
+      // --- Snap to existing overlays + reference lines ---
+      const SNAP_THRESHOLD = 20; // px
+
+      function getSnapEdges() {
+        const rect = img.getBoundingClientRect();
+        const imgW = rect.width;
+        const imgH = rect.height;
+        const xEdges = [];
+        const yEdges = [];
+
+        // Edges from current artists
+        artists.forEach((a) => {
+          const left = (a.area.x - a.area.width / 2) * imgW;
+          const right = (a.area.x + a.area.width / 2) * imgW;
+          const top = (a.area.y - a.area.height / 2) * imgH;
+          const bottom = (a.area.y + a.area.height / 2) * imgH;
+          xEdges.push(left, right);
+          yEdges.push(top, bottom);
+        });
+
+        // Edges from reference lines
+        for (const nx of refEdgesNorm.x) xEdges.push(nx * imgW);
+        for (const ny of refEdgesNorm.y) yEdges.push(ny * imgH);
+
+        return { xEdges, yEdges };
+      }
+
+      function snapToEdges(px, py) {
+        const { xEdges, yEdges } = getSnapEdges();
+        let snappedX = px,
+          snappedY = py;
+        let guidesX = [],
+          guidesY = [];
+
+        let minDx = SNAP_THRESHOLD;
+        for (const ex of xEdges) {
+          const d = Math.abs(px - ex);
+          if (d < minDx) {
+            minDx = d;
+            snappedX = ex;
+          }
+        }
+        if (snappedX !== px) guidesX.push(snappedX);
+
+        let minDy = SNAP_THRESHOLD;
+        for (const ey of yEdges) {
+          const d = Math.abs(py - ey);
+          if (d < minDy) {
+            minDy = d;
+            snappedY = ey;
+          }
+        }
+        if (snappedY !== py) guidesY.push(snappedY);
+
+        return { x: snappedX, y: snappedY, guidesX, guidesY };
+      }
+
+      function showSnapGuides(guidesX, guidesY) {
+        clearSnapGuides();
+        const rect = img.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        const offX = rect.left - wrapRect.left;
+        const offY = rect.top - wrapRect.top;
+
+        for (const gx of guidesX) {
+          const el = document.createElement("div");
+          el.className = "snap-guide vertical";
+          el.style.left = offX + gx + "px";
+          el.style.top = offY + "px";
+          el.style.height = rect.height + "px";
+          wrap.appendChild(el);
+        }
+        for (const gy of guidesY) {
+          const el = document.createElement("div");
+          el.className = "snap-guide horizontal";
+          el.style.top = offY + gy + "px";
+          el.style.left = offX + "px";
+          el.style.width = rect.width + "px";
+          wrap.appendChild(el);
+        }
+      }
+
+      function clearSnapGuides() {
+        wrap.querySelectorAll(".snap-guide").forEach((el) => el.remove());
+      }
+
+      // --- Image switching ---
+      document.getElementById("imageSelect").addEventListener("change", (e) => {
+        img.src = "/images/" + e.target.value;
+        const m = e.target.value.match(/day(\d+)/);
+        if (m) document.getElementById("dayNum").value = m[1];
+      });
+
+      // --- Drag to select ---
+      wrap.addEventListener("mousedown", (e) => {
+        if (e.target.closest(".artist-overlay")) return;
+        const rect = img.getBoundingClientRect();
+        if (
+          e.clientX < rect.left ||
+          e.clientX > rect.right ||
+          e.clientY < rect.top ||
+          e.clientY > rect.bottom
+        )
+          return;
+        dragging = true;
+        let px = e.clientX - rect.left;
+        let py = e.clientY - rect.top;
+        if (!e.altKey) {
+          const s = snapToEdges(px, py);
+          px = s.x;
+          py = s.y;
+          showSnapGuides(s.guidesX, s.guidesY);
+        }
+        startX = px;
+        startY = py;
+        selBox.style.left = startX + "px";
+        selBox.style.top = startY + "px";
+        selBox.style.width = "0";
+        selBox.style.height = "0";
+        selBox.style.display = "block";
+        e.preventDefault();
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!dragging) return;
+        const rect = img.getBoundingClientRect();
+        let curX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        let curY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        let guidesX = [],
+          guidesY = [];
+        if (!e.altKey) {
+          const s = snapToEdges(curX, curY);
+          curX = s.x;
+          curY = s.y;
+          guidesX = s.guidesX;
+          guidesY = s.guidesY;
+        }
+        showSnapGuides(guidesX, guidesY);
+        const x = Math.min(startX, curX);
+        const y = Math.min(startY, curY);
+        const w = Math.abs(curX - startX);
+        const h = Math.abs(curY - startY);
+        selBox.style.left = x + "px";
+        selBox.style.top = y + "px";
+        selBox.style.width = w + "px";
+        selBox.style.height = h + "px";
+      });
+
+      window.addEventListener("mouseup", (e) => {
+        if (!dragging) return;
+        dragging = false;
+        selBox.style.display = "none";
+        clearSnapGuides();
+
+        const rect = img.getBoundingClientRect();
+        let curX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        let curY = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+        if (!e.altKey) {
+          const s = snapToEdges(curX, curY);
+          curX = s.x;
+          curY = s.y;
+        }
+        const x1 = Math.min(startX, curX);
+        const y1 = Math.min(startY, curY);
+        const w = Math.abs(curX - startX);
+        const h = Math.abs(curY - startY);
+
+        // Ignore tiny selections
+        if (w < 5 || h < 5) return;
+
+        const imgW = rect.width;
+        const imgH = rect.height;
+
+        pendingArea = {
+          x: parseFloat(((x1 + w / 2) / imgW).toFixed(4)),
+          y: parseFloat(((y1 + h / 2) / imgH).toFixed(4)),
+          width: parseFloat((w / imgW).toFixed(4)),
+          height: parseFloat((h / imgH).toFixed(4)),
+        };
+
+        showForm();
+      });
+
+      // --- Look up time from reference Y position ---
+      function lookupTimeByY(normY) {
+        if (!refYToTime.length) return null;
+        let best = null,
+          bestDist = 0.01; // tolerance ~1% of image height
+        for (const entry of refYToTime) {
+          const d = Math.abs(entry.y - normY);
+          if (d < bestDist) {
+            bestDist = d;
+            best = entry.time;
+          }
+        }
+        return best;
+      }
+
+      // --- Auto-update end time on start time blur ---
+      function addMinutes(timeStr, mins) {
+        const m = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+        if (!m) return "";
+        const totalMins = parseInt(m[1]) * 60 + parseInt(m[2]) + mins;
+        const pad = (n) => String(n).padStart(2, "0");
+        return pad(Math.floor(totalMins / 60) % 24) + ":" + pad(totalMins % 60);
+      }
+
+      document.getElementById("fStart").addEventListener("blur", () => {
+        const startVal = document.getElementById("fStart").value.trim();
+        if (!startVal) return;
+        const endVal = addMinutes(startVal, 40);
+        if (endVal) document.getElementById("fEnd").value = endVal;
+      });
+
+      // --- Datalist for stages ---
+      function updateStageList() {
+        const datalist = document.getElementById("stageList");
+        const stages = [
+          ...new Set(artists.map((a) => a.stage).filter(Boolean)),
+        ];
+        datalist.innerHTML = stages
+          .map((s) => '<option value="' + s + '">')
+          .join("");
+      }
+
+      // --- Form with auto-fill ---
+      function getLastArtist() {
+        return artists.length > 0 ? artists[artists.length - 1] : null;
+      }
+
+      function showForm() {
+        const last = getLastArtist();
+        const dateStr = document.getElementById("dayDate").value; // e.g. "2026-03-21"
+
+        document.getElementById("fName").value = "";
+
+        // Auto-fill stage from last artist
+        document.getElementById("fStage").value = last ? last.stage : "";
+
+        // Auto-fill time: try reference Y lookup first, then fall back to last artist
+        const topY = pendingArea.y - pendingArea.height / 2;
+        const bottomY = pendingArea.y + pendingArea.height / 2;
+        const refStart = lookupTimeByY(topY);
+        const refEnd = lookupTimeByY(bottomY);
+
+        if (refStart) {
+          document.getElementById("fStart").value = refStart;
+        } else if (last && last.endTime) {
+          const t = last.endTime.split("T")[1] || last.endTime;
+          document.getElementById("fStart").value = t;
+        } else {
+          document.getElementById("fStart").value = "12:00";
+        }
+
+        if (refEnd) {
+          document.getElementById("fEnd").value = refEnd;
+        } else {
+          const startVal = document.getElementById("fStart").value;
+          const endVal = addMinutes(startVal, 40);
+          document.getElementById("fEnd").value = endVal || "";
+        }
+
+        document.getElementById("fCoords").textContent =
+          "座標：x=" +
+          pendingArea.x +
+          " y=" +
+          pendingArea.y +
+          " w=" +
+          pendingArea.width +
+          " h=" +
+          pendingArea.height;
+        formPanel.style.display = "block";
+        overlayBg.style.display = "block";
+        updateStageList();
+        document.getElementById("fName").focus();
+      }
+
+      function cancelForm() {
+        formPanel.style.display = "none";
+        overlayBg.style.display = "none";
+        pendingArea = null;
+      }
+
+      function submitForm() {
+        const name = document.getElementById("fName").value.trim();
+        if (!name) {
+          alert("請輸入藝人名稱");
+          return;
+        }
+        const dayNum = document.getElementById("dayNum").value;
+        idCounter++;
+        const artist = {
+          id: "d" + dayNum + "-" + String(idCounter).padStart(2, "0"),
+          name,
+          stage: document.getElementById("fStage").value.trim(),
+          startTime:
+            document.getElementById("dayDate").value +
+            "T" +
+            document.getElementById("fStart").value.trim(),
+          endTime:
+            document.getElementById("dayDate").value +
+            "T" +
+            document.getElementById("fEnd").value.trim(),
+          area: pendingArea,
+        };
+        artists.push(artist);
+        pendingArea = null;
+        formPanel.style.display = "none";
+        overlayBg.style.display = "none";
+        renderOverlays();
+      }
+
+      // --- Render overlays ---
+      function renderOverlays() {
+        wrap.querySelectorAll(".artist-overlay").forEach((el) => el.remove());
+        const rect = img.getBoundingClientRect();
+        const wrapRect = wrap.getBoundingClientRect();
+        const offX = rect.left - wrapRect.left;
+        const offY = rect.top - wrapRect.top;
+        const imgW = rect.width;
+        const imgH = rect.height;
+
+        artists.forEach((a, i) => {
+          const div = document.createElement("div");
+          div.className = "artist-overlay";
+          const left = (a.area.x - a.area.width / 2) * imgW + offX;
+          const top = (a.area.y - a.area.height / 2) * imgH + offY;
+          div.style.left = left + "px";
+          div.style.top = top + "px";
+          div.style.width = a.area.width * imgW + "px";
+          div.style.height = a.area.height * imgH + "px";
+
+          const span = document.createElement("span");
+          span.textContent = a.name;
+          div.appendChild(span);
+
+          const del = document.createElement("div");
+          del.className = "del";
+          del.textContent = "\u00d7";
+          del.onclick = (e) => {
+            e.stopPropagation();
+            artists.splice(i, 1);
+            renderOverlays();
+          };
+          div.appendChild(del);
+
+          wrap.appendChild(div);
+        });
+
+        document.getElementById("artistCount").textContent =
+          artists.length + " 位藝人";
+      }
+
+      // Re-render on image load and window resize
+      img.addEventListener("load", () => {
+        renderOverlays();
+        drawRefLines();
+      });
+      window.addEventListener("resize", () => {
+        renderOverlays();
+        drawRefLines();
+      });
+
+      // --- Export ---
+      function exportJSON() {
+        const dayNum = parseInt(document.getElementById("dayNum").value);
+        const data = {
+          day: dayNum,
+          date: document.getElementById("dayDate").value,
+          imageFile: document.getElementById("imageSelect").value,
+          artists: artists.map((a) => ({
+            id: a.id,
+            name: a.name,
+            stage: a.stage,
+            startTime: a.startTime,
+            endTime: a.endTime,
+            area: a.area,
+          })),
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "day" + dayNum + ".json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // --- Import ---
+      function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.day) document.getElementById("dayNum").value = data.day;
+            if (data.date) document.getElementById("dayDate").value = data.date;
+            if (data.imageFile) {
+              document.getElementById("imageSelect").value = data.imageFile;
+              img.src = "/images/" + data.imageFile;
+            }
+            if (Array.isArray(data.artists)) {
+              artists = data.artists;
+              idCounter = artists.length;
+              renderOverlays();
+            }
+          } catch (err) {
+            alert("JSON 格式錯誤：" + err.message);
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = "";
+      }
+    </script>
+  </body>
+</html>
