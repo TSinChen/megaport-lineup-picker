@@ -99,17 +99,23 @@ export default function LineupCanvas({
 
   // 載入圖片
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     const img = new Image();
     img.src = `/images/${imageFile}`;
     img.onload = () => {
+      if (cancelled) return;
       imageRef.current = img;
       resizeCanvas();
       drawWithHover();
       setLoading(false);
     };
     img.onerror = () => {
+      if (cancelled) return;
       setLoading(false);
+    };
+    return () => {
+      cancelled = true;
     };
   }, [imageFile, canvasRef, resizeCanvas, drawWithHover]);
 
