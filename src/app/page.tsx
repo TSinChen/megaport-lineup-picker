@@ -49,7 +49,7 @@ export default function Home() {
       <header className="text-center px-4">
         <h1 className="text-2xl font-black tracking-tight">大港開唱 選團器</h1>
         <p className="text-zinc-400 text-sm mt-1">
-          點擊圖片上的藝人來標記，讓大家知道你想去哪裡
+          點擊圖片上的藝人來標記，讓大家知道你想聽什麼
         </p>
       </header>
 
