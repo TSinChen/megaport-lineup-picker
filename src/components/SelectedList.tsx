@@ -32,14 +32,10 @@ export default function SelectedList({
   selectedIds,
   onToggle,
 }: SelectedListProps) {
-  const [isIOSSafari, setIsIOSSafari] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    setIsIOSSafari(
-      isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua)
-    );
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
   }, []);
 
   const selected = artists
@@ -77,7 +73,7 @@ export default function SelectedList({
             </span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            {!isIOSSafari && (
+            {!isMobile && (
               <a
                 href={getGoogleCalendarUrl(artist)}
                 target="_blank"

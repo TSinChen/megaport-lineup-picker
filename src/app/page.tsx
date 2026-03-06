@@ -46,7 +46,7 @@ export default function Home() {
 
   return (
     <main className="max-w-6xl mx-auto pt-6 pb-16">
-      <header className="text-center mb-6 px-4">
+      <header className="text-center px-4">
         <h1 className="text-2xl font-black tracking-tight">
           大港開唱 選團器
         </h1>
@@ -55,7 +55,7 @@ export default function Home() {
         </p>
       </header>
 
-      <div className="flex justify-center mb-4 px-4 sticky top-0 z-40 bg-black/85 py-3">
+      <div className="flex justify-center px-4 sticky top-0 z-40 bg-black/85 py-3">
         <DayTabs
           currentDay={currentDay}
           onDayChange={setCurrentDay}
