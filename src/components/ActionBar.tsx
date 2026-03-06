@@ -29,7 +29,7 @@ export default function ActionBar({
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(ua));
     // iOS Safari: 有 Safari 但沒有 CriOS/FxiOS/其他瀏覽器標識
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    setIsIOSSafari(isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua));
+    setIsIOSSafari(isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS|FBAN|FBAV|Instagram|Line|Twitter/i.test(ua));
   }, []);
 
   const selected = artists
