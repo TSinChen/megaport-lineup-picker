@@ -10,8 +10,7 @@ export default function DayTabs({ currentDay, onDayChange, days }: DayTabsProps)
   return (
     <div className="flex gap-2">
       {days.map(({ day, date }) => {
-        const [, m, d] = date.split("-");
-        const label = `Day ${day} (${parseInt(m)}/${parseInt(d)})`;
+        const label = `Day ${day}`;
         return (
           <button
             key={day}
