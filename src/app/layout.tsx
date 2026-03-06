@@ -13,14 +13,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "大港開唱 選團器",
-  description: "在 lineup 圖上圈選你想看的藝人，完成後分享給朋友",
+  description: "點擊圖片上的藝人來標記，讓大家知道你想聽什麼",
   icons: {
     icon: "/favicon.png",
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "大港開唱 選團器",
-    description: "在 lineup 圖上圈選你想看的藝人，完成後分享給朋友",
+    description: "點擊圖片上的藝人來標記，讓大家知道你想聽什麼",
     type: "website",
   },
 };
