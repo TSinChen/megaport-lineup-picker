@@ -23,13 +23,15 @@ export default function ActionBar({
 }: ActionBarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isIOSSafari, setIsIOSSafari] = useState(false);
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
 
   useEffect(() => {
     const ua = navigator.userAgent;
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(ua));
-    // iOS Safari: 有 Safari 但沒有 CriOS/FxiOS/其他瀏覽器標識
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    setIsIOSSafari(isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS|FBAN|FBAV|Instagram|Line|Twitter/i.test(ua));
+    const inApp = /FBAN|FBAV|Instagram|Line|Twitter/i.test(ua);
+    setIsInAppBrowser(inApp);
+    setIsIOSSafari(isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua) && !inApp);
   }, []);
 
   const selected = artists
@@ -78,16 +80,18 @@ export default function ActionBar({
             分享圖片
           </button>
         )}
-        <button
-          onClick={handleDownload}
-          disabled={disabled}
-          className={isMobile ? btnSecondary : "flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg font-bold text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          下載圖片
-        </button>
+        {!isInAppBrowser && (
+          <button
+            onClick={handleDownload}
+            disabled={disabled}
+            className={isMobile ? btnSecondary : "flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg font-bold text-sm hover:bg-yellow-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            下載圖片
+          </button>
+        )}
         {(!isMobile || isIOSSafari) && (
           <button
             onClick={handleExportICS}
