@@ -41,17 +41,15 @@ export default function Home() {
       const updated = toggleArtist(year, currentDay, artistId);
       setSelectedIds([...updated]);
     },
-    [year, currentDay]
+    [year, currentDay],
   );
 
   return (
     <main className="max-w-6xl mx-auto pt-6 pb-16">
       <header className="text-center px-4">
-        <h1 className="text-2xl font-black tracking-tight">
-          大港開唱 選團器
-        </h1>
+        <h1 className="text-2xl font-black tracking-tight">大港開唱 選團器</h1>
         <p className="text-zinc-400 text-sm mt-1">
-          點擊圖片上的藝人來標記，完成後分享給朋友
+          點擊圖片上的藝人來標記，讓大家知道你想去哪裡
         </p>
       </header>
 
@@ -59,7 +57,10 @@ export default function Home() {
         <DayTabs
           currentDay={currentDay}
           onDayChange={setCurrentDay}
-          days={Object.values(lineups).map((l) => ({ day: l.day, date: l.date }))}
+          days={Object.values(lineups).map((l) => ({
+            day: l.day,
+            date: l.date,
+          }))}
         />
       </div>
 
@@ -85,7 +86,7 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="text-center text-zinc-400 text-sm px-4 mt-8 mb-4">
+      <footer className="text-center text-zinc-400 text-sm px-4 my-6">
         本網站為樂迷自製工具，非大港開唱官方網站。
         <br />
         所有藝人資訊與圖片版權歸原主辦單位所有。
