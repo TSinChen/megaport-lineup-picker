@@ -12,16 +12,25 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://megaport-lineup-picker.com"),
   title: "大港開唱 選團器",
   description: "點擊圖片上的藝人來標記，讓大家知道你想聽什麼",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.png", sizes: "192x192", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: "大港開唱 選團器",
     description: "點擊圖片上的藝人來標記，讓大家知道你想聽什麼",
     type: "website",
+    url: "https://megaport-lineup-picker.com",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 };
 
