@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://megaport-lineup-picker.com"),
   title: "大港開唱 選團器 | Megaport Festival Lineup Picker",
   description: "大港開唱選團工具，在 lineup 圖上選團、標記你想看的藝人陣容，分享給朋友一起聽",
-  keywords: ["大港開唱", "選團", "選團器", "lineup", "陣容", "Megaport", "大港開唱 2026"],
   alternates: {
     canonical: "/",
   },
