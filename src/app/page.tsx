@@ -44,8 +44,23 @@ export default function Home() {
     [year, currentDay],
   );
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "大港開唱 選團器",
+    alternateName: "Megaport Festival Lineup Picker",
+    description: "大港開唱選團工具，在 lineup 圖上選團、標記你想看的藝人陣容",
+    url: "https://megaport-lineup-picker.com",
+    applicationCategory: "EntertainmentApplication",
+    operatingSystem: "All",
+  };
+
   return (
     <main className="max-w-6xl mx-auto pt-6 pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <header className="text-center px-4">
         <h1 className="text-2xl font-black tracking-tight">大港開唱 選團器</h1>
         <p className="text-zinc-400 text-sm mt-1">
